@@ -1,0 +1,32 @@
+services:
+  pizza-robust-tracker:
+    build: .
+    # user: "1000:1000"
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models:z
+      - ./videos:/app/videos:z
+      - ./output:/app/output:z
+    environment:
+      - PYTHONPATH=/app
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_ENABLE_CORS=false
+      - STREAMLIT_SERVER_MAXUPLOADSIZE=2048
+      - STREAMLIT_SERVER_MAXMESSAGESIZE=2048
+      - STREAMLIT_SERVER_ENABLEXSRFPROTECTION=false
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:8501/_stcore/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
