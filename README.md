@@ -26,7 +26,13 @@ This system processes video feeds from 6 pizza store cameras (CAM01-CAM06) to au
 - **Recall Enhancement**: Increased from 54.5% to 66.7% (+12.2%)
 - **mAP@0.5 Improvement**: Enhanced from 68.2% to 83.1% (+14.9%)
 - **Balanced Trade-off**: Slight precision reduction (98.8% → 89.5%) for significantly better detection coverage
-- **Practical Benefits**: Reduces missed pizza detections, improving sales accuracy
+- **Practical Benefits**: Reduces missed pizza detections, flickering pizza object detection, pizza id explosion and improving sales accuracy
+
+**Output Videos**
+The processed video outputs for all six camera feeds are available for review on Google Drive. 
+
+*   **Link:** [Output Videos Folder](https://drive.google.com/drive/folders/1auV7IkmjRXPIgGssgnFCcYE2S_ZzrQYJ?usp=drive_link)
+*   **Access Note:** Please be aware that access to this folder is restricted and requires authorization.
 
 ## Project Structure
 
@@ -90,7 +96,7 @@ The process began with raw data from **6 store cameras (CAM01-CAM06)**, amountin
 *   **Golden Frame Identification**: The 300 frames were further scrutinized to identify **53 "golden frames"**. These were determined to be the highest-quality images, offering the clearest and most diverse examples of pizzas in the staging areas, making them ideal for building the core of the training dataset.
 
 #### **Annotation Process and Data Augmentation**
-*   **Annotation Rules**: The annotation process, will use roboflow on https://roboflow.com for performed on the 53 golden frames, adhered to strict guidelines to ensure consistency:
+*   **Annotation Rules**: The annotation process, will use roboflow on https://roboflow.com and its API for performed on the 53 golden frames, adhered to strict guidelines to ensure consistency:
     *   **Inclusions**: Only whole, finished pizzas in open boxes or on serving plates located within the designated staging areas were labeled.
     *   **Exclusions**: Items such as pizzas still in preparation, pizzas in closed boxes, partial or sliced pizzas, and promotional demo samples were explicitly excluded from annotation.
     *   **Edge Cases**: Specific rules were applied to handle challenging scenarios like glare, significant occlusion (over 50%), and pizzas located at the frame boundaries.
@@ -118,27 +124,28 @@ The second dataset v2 of 540 images was partitioned into three distinct sets to 
 ### Multi-Camera Inference Development
 - **Zone Definition**: PolygonZone tool for staging area coordinate mapping
 - **Tracking Logic**: Zone-based pizza lifecycle (in_zone → pending_dispatch → dispatched)
-- **Sales Algorithm**: 90-second dispatch threshold with probation-based confirmation
+- **Sales Algorithm**: 90-second dispatch threshold with probation-based (avoiding ghosting issues) confirmation
 - **Robust Processing**: Spatial memory management to eliminate false positives
 
 ## Deployment Architecture
 
 ### Docker Compose Setup
-- **Training Container**: Google Colab environment replication
+- **Training Environment**: Google Colab environment with L4 GPU, standard CPU and RAM
 - **Inference Container**: Streamlit web application 
 - **Model Management**: Automated model switching between v1 and v2 versions
 
 
 ## Usage Instructions
 
-### Model Training
-1. **Data Preparation**: Extract and annotate frames using provided notebooks
-2. **Google Colab Training**: Use notebook 02 for model training with GPU acceleration
-3. **Model Evaluation**: Validate performance using notebook 03 for testing inference pipeline
+### Model Training and testing inference pipeline
+1. **Data Preparation**: Extract and annotate frames using provided notebooks: `01_data_exploration_eng.ipynb`
+2. **Google Colab Training**: Use notebook `02_colab_training_eng.ipynb` for model training with GPU acceleration
+3. **Model Evaluation**: Validate performance using notebook `03_multi_cam_inference_pipeline.ipynb` for testing inference pipeline
 
 ### System Deployment
-1. **Docker Setup**: `docker-compose up --build` for complete system deployment
-2. **Web Access**: Streamlit dashboard available at `http://localhost:8501`
+1. ` git clone https://github.com/Daniel-LeTC/pizza_count_cv.git ` 
+2. **Docker Setup**: `docker-compose up --build` for complete system deployment
+3. **Web Access**: Streamlit dashboard available at `http://localhost:8501`
 
 ### Model Fine-tuning
 - **Continuous Learning**: Feedback system enables model retraining with user corrections
@@ -148,7 +155,14 @@ The second dataset v2 of 540 images was partitioned into three distinct sets to 
 
 
 ### User Guide: Pizza Sales Tracking Application
+
+**Image for streamlit app, front end of this project**
 ![](assets/dashboard_ui.png)
+**Image after finishing processed videos**
+
+![](assets/finished_processing_01.png)
+
+![](assets/finished_processing_02.png)
 
 This guide provides instructions on how to use the Streamlit application for processing, analyzing, and reviewing pizza sales videos. The application integrates the YOLOv8s model for detection and a robust zone-based tracking system to count sales.
 
